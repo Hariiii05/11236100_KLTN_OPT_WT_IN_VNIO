@@ -1,0 +1,22 @@
+{
+  "encounter": {
+    "format": "csv",
+    "encoding": "cp1258"
+  },
+  "reception": {
+    "format": "csv",
+    "encoding": "utf-8-sig"
+  },
+  "exam": {
+    "format": "csv",
+    "encoding": "utf-8-sig"
+  },
+  "journey": {
+    "format": "csv",
+    "encoding": "utf-8"
+  },
+  "status_log": {
+    "format": "csv",
+    "encoding": "cp1258"
+  }
+}

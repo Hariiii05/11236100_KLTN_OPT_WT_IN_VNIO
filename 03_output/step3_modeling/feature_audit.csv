@@ -1,0 +1,16 @@
+﻿feature_or_group,source,availability,used_in_model,decision
+ma_dich_vu,Danh mục dịch vụ đã đăng ký,Có trước hoặc tại queue_entry_time,True,Giữ một mã; không dùng đồng thời ID/tên trùng thông tin.
+ma_phong_thuc_hien,Phòng thực hiện,Được xác định khi vào hàng đợi,True,Cần thiết cho điều kiện vận hành theo phòng.
+ma_khoa_thuc_hien,Khoa của phòng,Được xác định khi vào hàng đợi,True,Thông tin tổ chức đã biết tại thời điểm dự báo.
+queue_entry_status,Status 20 hoặc 40 dùng làm mốc,Chính là trigger dự báo,True,Phân biệt hai luồng nghiệp vụ target V2.
+uu_tien,Cờ ưu tiên,Đã có trong hàng đợi,True,Chỉ dùng nếu hệ thống vận hành giữ nguyên ý nghĩa hiện tại.
+cap_cuu,Cờ cấp cứu,Đã có trong hàng đợi,True,An toàn theo thời gian; có thể không có phương sai.
+stt,Số thứ tự hàng đợi,Đã cấp khi vào hàng đợi,True,Không dùng giá trị cập nhật sau queue_entry_time.
+queue_entry_hour/day_of_week/is_weekend,Lịch từ queue_entry_time,Biết tại thời điểm dự báo,True,"Biến đổi xác định, không fit trên tương lai."
+queue_hour/dow_sin_cos,Mã hóa chu kỳ từ queue_entry_time,Biết tại thời điểm dự báo,True,"Biến đổi xác định, không fit trên tương lai."
+order_to_queue_minutes,Khoảng chỉ định đến vào hàng đợi,Đã hoàn tất tại queue_entry_time,True,Không chứa sự kiện sau thời điểm dự báo.
+bac_si_kham_id/ma_bac_si_kham,Bác sĩ trong snapshot cuối,Chưa chứng minh được đã gán trước queue,False,Loại khỏi baseline để tránh temporal leakage.
+nb_dich_vu_id/nb_dot_dieu_tri_id,Khóa định danh,Có thể tồn tại nhưng không phải tín hiệu tổng quát,False,"Chỉ dùng truy vết và kiểm tra overlap, không làm predictor."
+queue_entry_time/date/month,Timestamp hoặc nhãn thời gian thô,Biết tại thời điểm dự báo,False,Chỉ dùng chia tập; tránh học thuộc xu hướng tuyệt đối.
+thoi_gian_chi_dinh,Timestamp chỉ định thô,Có trước dự báo,False,Chỉ dùng qua order_to_queue_minutes.
+waiting_minutes/exam_start_time,Target và thời điểm kết quả,Chỉ có sau dự báo,False,Tuyệt đối không dùng làm predictor.

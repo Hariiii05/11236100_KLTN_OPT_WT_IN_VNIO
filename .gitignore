@@ -1,0 +1,23 @@
+# Local Python and notebook state
+.venv/
+.jupyter-config/
+**/__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Raw/intermediate HIS extracts (large and potentially sensitive)
+01_data_input/
+03_work/
+
+# Row-level generated datasets
+03_output/event_log_normalized.csv
+03_output/exam_wait_target_v*.csv
+03_output/step2_eda/step2_baseline_features.csv
+03_output/step2_eda/step2_model_dataset.csv
+03_output/step2_eda/tables/
+03_output/step3_modeling/final_test_predictions.csv
+
+# Local logs and operating-system files
+*.log
+.DS_Store
+Thumbs.db

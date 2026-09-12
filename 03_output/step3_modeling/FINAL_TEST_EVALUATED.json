@@ -1,0 +1,24 @@
+{
+  "evaluated_at_utc": "2026-08-31T03:12:48.124212+00:00",
+  "dataset_sha256": "96eb8d0a3657fe224eb08e4034ab585590f980af3ce36dbc5e267daa4cdfec50",
+  "selected_window": "sliding",
+  "selected_model": "hist_gb_absolute",
+  "train_rows": 49017,
+  "purged_unavailable_label_rows": 12,
+  "test_rows": 41305,
+  "test_start": "2026-07-01 00:00:00",
+  "test_end": "2026-08-04 10:19:34.286000",
+  "overall_metrics": {
+    "group": "overall",
+    "rows": 41305,
+    "mae": 15.693583816059004,
+    "rmse": 319.6582469196239,
+    "median_ae": 6.544771184249065,
+    "r2": 0.006185613016709279,
+    "p90_ae": 21.79571707338924,
+    "bias": -6.75030644850583,
+    "within_10m_rate": 0.6751724972763588,
+    "within_20m_rate": 0.8846870838881491
+  },
+  "warning": "Hold-out Test has been evaluated. Do not use these results for further model, feature, or hyperparameter selection."
+}

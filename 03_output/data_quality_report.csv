@@ -1,0 +1,46 @@
+﻿check,dataset,value,detail
+row_count,encounter,167518,
+key_null,encounter,0,nb_dot_dieu_tri_id
+key_duplicate_rows,encounter,0,nb_dot_dieu_tri_id
+time_null,encounter,0,thoi_gian_vao_vien
+time_null,encounter,10415,thoi_gian_ra_vien
+row_count,reception,145951,
+key_null,reception,0,lay_so_tiep_don_id
+key_duplicate_rows,reception,0,lay_so_tiep_don_id
+time_null,reception,0,thoi_gian_vao_vien
+time_null,reception,0,thoi_gian_lay_so
+time_null,reception,0,thoi_gian_hoan_thanh
+row_count,exam,170216,
+key_null,exam,0,nb_dich_vu_id
+key_duplicate_rows,exam,0,nb_dich_vu_id
+time_null,exam,0,thoi_gian_chi_dinh
+time_null,exam,3209,thoi_gian_tiep_nhan
+time_null,exam,0,thoi_gian_thuc_hien
+time_null,exam,7260,thoi_gian_ket_luan
+time_null,exam,170216,thoi_gian_xac_nhan_khong_thuc_hien
+row_count,journey,676727,
+key_null,journey,0,nb_dich_vu_id
+key_duplicate_rows,journey,0,nb_dich_vu_id
+time_null,journey,0,thoi_gian_chi_dinh
+time_null,journey,417373,thoi_gian_tiep_nhan
+time_null,journey,0,thoi_gian_thuc_hien
+time_null,journey,421711,thoi_gian_co_ket_qua
+time_null,journey,676723,thoi_gian_xac_nhan_khong_thuc_hien
+row_count,status_log,1017080,
+key_null,status_log,0,nb_dich_vu_id
+key_duplicate_rows,status_log,846877,nb_dich_vu_id
+time_null,status_log,0,thoi_gian_thay_doi_ban_ghi
+negative_duration,encounter,0,thoi_gian_vao_vien -> thoi_gian_ra_vien
+negative_duration,reception,1,thoi_gian_vao_vien -> thoi_gian_lay_so
+negative_duration,reception,0,thoi_gian_lay_so -> thoi_gian_hoan_thanh
+negative_duration,journey,201,thoi_gian_chi_dinh -> thoi_gian_tiep_nhan
+negative_duration,journey,27268,thoi_gian_tiep_nhan -> thoi_gian_thuc_hien
+encounter_join,reception,145507,145951 non-null keys; unmatched=444
+encounter_join,exam,170213,170216 non-null keys; unmatched=3
+encounter_join,journey,636672,676727 non-null keys; unmatched=40055
+encounter_join,status_log,1017080,1017080 non-null keys; unmatched=0
+exam_join,journey,170216,676727 non-null keys; unmatched=506511
+exam_join,status_log,1017080,1017080 non-null keys; unmatched=0
+doi_tuong_kcb_values,encounter,1,"[""1""]"
+khoa_scope,encounter,9,"in_scope=[152, 153, 155, 156, 157, 158, 159, 160, 161]; out_of_scope=[]"
+doi_tuong_kcb_values,exam,1,"[""1""]"
