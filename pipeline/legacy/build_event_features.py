@@ -8,7 +8,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from prepare_his_events import read_extract
+from pipeline.prepare_event_log import read_extract
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 def events_before(values: np.ndarray, times: np.ndarray, window_minutes: int) -> np.ndarray:
@@ -32,9 +35,21 @@ def active_queue_size(frame: pd.DataFrame) -> pd.Series:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input-dir", type=Path, default=Path("03_output"))
-    parser.add_argument("--data-dir", type=Path, default=Path("01_data_input"))
-    parser.add_argument("--output-dir", type=Path, default=Path("03_output"))
+    parser.add_argument(
+        "--input-dir",
+        type=Path,
+        default=PROJECT_ROOT / "results" / "archive" / "legacy_event_target",
+    )
+    parser.add_argument(
+        "--data-dir",
+        type=Path,
+        default=PROJECT_ROOT / "data" / "raw",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=PROJECT_ROOT / "results" / "archive" / "legacy_event_features",
+    )
     args = parser.parse_args()
     args.output_dir.mkdir(parents=True, exist_ok=True)
 

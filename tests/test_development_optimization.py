@@ -4,7 +4,7 @@ import unittest
 
 import pandas as pd
 
-from optimize_development_model import add_causal_features
+from pipeline.optimize_on_development import add_causal_features
 
 
 class CausalFeatureTests(unittest.TestCase):

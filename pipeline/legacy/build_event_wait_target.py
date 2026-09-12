@@ -8,6 +8,9 @@ from pathlib import Path
 import pandas as pd
 
 
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+
 EVENT_COLUMNS = [
     "nb_dot_dieu_tri_id",
     "nb_dich_vu_id",
@@ -116,8 +119,16 @@ def build_target(event_path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", type=Path, default=Path("03_output/event_log_normalized.csv"))
-    parser.add_argument("--output-dir", type=Path, default=Path("03_output"))
+    parser.add_argument(
+        "--input",
+        type=Path,
+        default=PROJECT_ROOT / "data" / "processed" / "event_log.csv",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=PROJECT_ROOT / "results" / "archive" / "legacy_event_target",
+    )
     args = parser.parse_args()
     args.output_dir.mkdir(parents=True, exist_ok=True)
     target, summary = build_target(args.input)

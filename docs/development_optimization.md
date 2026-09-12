@@ -59,12 +59,12 @@ l2_regularization = 1,0
 
 Kết quả cho thấy queue dynamics cải thiện ổn định trên development folds. Đây là thử nghiệm phát triển, không thay thế kết quả Final Test chính thức và không được diễn giải là Final Test đã tăng từ 88,47% lên một con số mới.
 
-Trong luận văn có thể trình bày phần này như một ablation hoặc hướng cải tiến đã kiểm chứng bằng walk-forward development validation. Kết quả Final Test và mô hình chính thức trong `03_output/step3_modeling/` vẫn giữ nguyên.
+Trong luận văn có thể trình bày phần này như một ablation hoặc hướng cải tiến đã kiểm chứng bằng walk-forward development validation. Kết quả Final Test và mô hình chính thức trong `results/final_model/` vẫn giữ nguyên.
 
 ## 5. Artifact
 
-- Script: `02_processing/optimize_development_model.py`
-- Metric từng fold: `03_output/development_optimization/development_fold_metrics.csv`
-- Bảng tổng hợp: `03_output/development_optimization/development_metric_summary.csv`
-- Cấu hình được chọn: `03_output/development_optimization/selected_development_candidate.json`
-- Biểu đồ so sánh: `03_output/development_optimization/development_candidate_comparison.png`
+- Script: `pipeline/optimize_on_development.py`
+- Metric từng fold: `results/development_experiments/development_fold_metrics.csv`
+- Bảng tổng hợp: `results/development_experiments/development_metric_summary.csv`
+- Cấu hình được chọn: `results/development_experiments/selected_development_candidate.json`
+- Biểu đồ so sánh: `results/development_experiments/development_candidate_comparison.png`

@@ -4,7 +4,7 @@ import unittest
 
 import pandas as pd
 
-from prepare_his_events import build_events
+from pipeline.prepare_event_log import build_events
 
 
 class EventLogDeduplicationTests(unittest.TestCase):

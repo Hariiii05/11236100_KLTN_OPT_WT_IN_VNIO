@@ -1,11 +1,11 @@
-# Bước 3 – Triển khai mô hình thời gian chờ khám
+# Đánh giá mô hình thời gian chờ khám chính thức
 
 > Kết quả được khóa ngày 31/08/2026. Final Test đã được đánh giá một lần và không được dùng để lựa chọn lại mô hình, feature hoặc hyperparameter.
 
 ## 1. Bài toán và dữ liệu
 
 - Đơn vị dự báo: một dịch vụ khám (`nb_dich_vu_id`).
-- Thời điểm dự báo: `queue_entry_time` theo quy tắc target V2.
+- Thời điểm dự báo: `queue_entry_time` theo quy tắc target khám chính thức.
 - Target: `waiting_minutes` từ status hàng đợi bắt buộc đến status `60` đầu tiên.
 - Tổng dữ liệu model: 141.519 dòng, từ 01/04/2026 đến 04/08/2026.
 - Development: 100.214 dòng có `queue_entry_time < 01/07/2026`.
@@ -43,7 +43,7 @@ Có 1–9 encounter xuất hiện ở cả train và validation tùy fold. Pipel
 Feature sử dụng:
 
 - dịch vụ, phòng, khoa;
-- status bắt đầu hàng đợi `20` hoặc `40`;
+- status bắt đầu hàng đợi `20` hoặc `40` theo nhánh nghiệp vụ;
 - ưu tiên, cấp cứu, số thứ tự;
 - giờ, thứ trong tuần, cuối tuần và mã hóa chu kỳ sin/cos;
 - thời gian từ chỉ định đến khi vào hàng đợi.
@@ -91,16 +91,15 @@ RMSE và R² bị chi phối mạnh bởi các ca chờ thực tế rất dài; 
 
 Hiệu năng status `20` kém rõ rệt và có bias âm lớn. Vì phát hiện này xuất phát từ Final Test, không được dùng để chỉnh mô hình hiện tại. Thiết kế mô hình riêng cho status `20` được ghi nhận là hướng nghiên cứu ngoài phạm vi của kết quả hiện tại.
 
-## 6. Artifact và cách chạy
+## 6. Artifact và lệnh kiểm tra
 
-Script: `02_processing/train_waiting_models.py`
+Script: `pipeline/train_and_evaluate_model.py`
 
 ```powershell
-.\.venv\Scripts\python.exe 02_processing\train_waiting_models.py --stage validate
-.\.venv\Scripts\python.exe 02_processing\train_waiting_models.py --stage final-test
+.\.venv\Scripts\python.exe -m pipeline.train_and_evaluate_model --stage validate
 ```
 
-Sau lần chạy hiện tại, lệnh `final-test` thứ hai sẽ bị từ chối bởi `FINAL_TEST_EVALUATED.json`.
+Các artifact nằm trong `results/final_model/`. Final Test đã được đánh giá và khóa; không chạy lại `--stage final-test`. Nếu lệnh này bị gọi nhầm, `FINAL_TEST_EVALUATED.json` sẽ từ chối thực thi.
 
 | File | Nội dung |
 |---|---|

@@ -14,6 +14,8 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
 RAW_NAMES = [
     '01_encounter.csv',
     '02_reception.csv',
@@ -458,8 +460,8 @@ def build_business_checks(paths: dict[str, Path], target: pd.DataFrame) -> tuple
     ])
 
     valid = target.loc[target['target_valid_v2']]
-    rows.append({'check':'Target V2: valid theo quy tắc nghiệp vụ','value':int(len(valid)),'rate':float(len(valid)/len(target)) if len(target) else np.nan,'interpretation':'KB008 hoặc phòng H401 dùng 20 -> 60; các ca còn lại dùng 40 -> 60.'})
-    rows.append({'check':'Target V2: waiting > 24h','value':int(valid['waiting_minutes'].gt(1440).sum()),'rate':float(valid['waiting_minutes'].gt(1440).mean()),'interpretation':'Trường hợp thực tế; giữ nguyên trong dữ liệu và gắn cờ để báo cáo.'})
+    rows.append({'check':'Target khám: valid theo quy tắc nghiệp vụ','value':int(len(valid)),'rate':float(len(valid)/len(target)) if len(target) else np.nan,'interpretation':'KB008 hoặc phòng H401 dùng 20 -> 60; các ca còn lại dùng 40 -> 60.'})
+    rows.append({'check':'Target khám: waiting > 24h','value':int(valid['waiting_minutes'].gt(1440).sum()),'rate':float(valid['waiting_minutes'].gt(1440).mean()),'interpretation':'Trường hợp thực tế; giữ nguyên trong dữ liệu và gắn cờ để báo cáo.'})
     return pd.DataFrame(rows), arrival_hour_dist, service_type_dist
 
 def _safe_sheet_name(name: str) -> str:
@@ -532,14 +534,17 @@ def write_report(out_path: Path, tables: dict[str, pd.DataFrame], readme_rows: l
 
 
 def main(
-    raw_dir: str | Path = '01_data_input',
-    normalized_dir: str | Path = '03_work/csv',
-    out_dir: str | Path = '03_output',
+    raw_dir: str | Path = PROJECT_ROOT / 'data' / 'raw',
+    normalized_dir: str | Path = PROJECT_ROOT / 'data' / 'intermediate',
+    processed_dir: str | Path = PROJECT_ROOT / 'data' / 'processed',
+    audit_dir: str | Path = PROJECT_ROOT / 'results' / 'audit',
 ):
     raw_dir = Path(raw_dir)
     normalized_dir = Path(normalized_dir)
-    out_dir = Path(out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
+    processed_dir = Path(processed_dir)
+    audit_dir = Path(audit_dir)
+    processed_dir.mkdir(parents=True, exist_ok=True)
+    audit_dir.mkdir(parents=True, exist_ok=True)
 
     # Use already normalized intermediate CSVs when present; otherwise normalize raw files.
     paths = {}
@@ -570,16 +575,16 @@ def main(
         .sort_values('waiting_minutes', ascending=False)
         .head(100)[['nb_dich_vu_id','nb_dot_dieu_tri_id','target_rule','queue_entry_status','queue_entry_time','exam_start_time','waiting_minutes','phong_thuc_hien_id','ma_phong_thuc_hien','bac_si_kham_id','ma_bac_si_kham','cross_day_wait']])
 
-    target_path = out_dir / 'exam_wait_target_v2.csv'
+    target_path = processed_dir / 'exam_wait_target_all.csv'
     target.to_csv(target_path, index=False, encoding='utf-8-sig', date_format='%Y-%m-%d %H:%M:%S.%f')
 
-    valid_path = out_dir / 'exam_wait_target_v2_valid.csv'
+    valid_path = processed_dir / 'exam_wait_target_valid.csv'
     target.loc[target['target_valid_v2']].to_csv(valid_path, index=False, encoding='utf-8-sig', date_format='%Y-%m-%d %H:%M:%S.%f')
 
-    report_path = out_dir / 'HIS_data_audit_report.xlsx'
+    report_path = audit_dir / 'HIS_data_audit_report.xlsx'
     readme_rows = [
         ('Mục tiêu', 'Audit 5 nguồn HIS và xác minh target waiting_minutes trước EDA/ML.'),
-        ('Target V2', 'KB008 hoặc phòng H401: status 20 cuối trước status 60 đầu; các ca khác: status 40 cuối trước status 60 đầu.'),
+        ('Target khám chính thức', 'KB008 hoặc phòng H401: status 20 cuối trước status 60 đầu; các ca khác: status 40 cuối trước status 60 đầu.'),
         ('Quy tắc nghiệp vụ', 'KB008 và phòng H401 không cần đo thị lực nên bắt đầu chờ từ status 20; các ca còn lại bắt đầu chờ sau đo thị lực ở status 40.'),
         ('Đơn vị target', '1 dòng / nb_dich_vu_id (dịch vụ khám).'),
         ('Quy tắc valid', 'Có status bắt buộc theo đúng nhánh nghiệp vụ trước status 60 và waiting_minutes >= 0.'),
@@ -630,7 +635,7 @@ def main(
         },
         'joins': join_audit.to_dict(orient='records'),
     }
-    with open(out_dir / 'step1_summary.json', 'w', encoding='utf-8') as f:
+    with open(audit_dir / 'target_build_summary.json', 'w', encoding='utf-8') as f:
         json.dump(summary_json, f, ensure_ascii=False, indent=2, default=str)
 
     return summary_json
@@ -638,10 +643,28 @@ def main(
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Audit HIS extracts and build waiting-time target.')
-    parser.add_argument('--raw-dir', type=Path, default=Path('01_data_input'))
-    parser.add_argument('--normalized-dir', type=Path, default=Path('03_work/csv'))
-    parser.add_argument('--out-dir', type=Path, default=Path('03_output'))
+    parser.add_argument('--raw-dir', type=Path, default=PROJECT_ROOT / 'data' / 'raw')
+    parser.add_argument(
+        '--normalized-dir',
+        type=Path,
+        default=PROJECT_ROOT / 'data' / 'intermediate',
+    )
+    parser.add_argument(
+        '--processed-dir',
+        type=Path,
+        default=PROJECT_ROOT / 'data' / 'processed',
+    )
+    parser.add_argument(
+        '--audit-dir',
+        type=Path,
+        default=PROJECT_ROOT / 'results' / 'audit',
+    )
     args = parser.parse_args()
-    result = main(args.raw_dir, args.normalized_dir, args.out_dir)
+    result = main(
+        args.raw_dir,
+        args.normalized_dir,
+        args.processed_dir,
+        args.audit_dir,
+    )
     # ASCII escapes keep CLI output portable on Windows consoles using cp1252.
     print(json.dumps(result, ensure_ascii=True, indent=2, default=str))

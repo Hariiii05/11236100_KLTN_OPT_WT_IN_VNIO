@@ -30,7 +30,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OrdinalEncoder
 
-from train_waiting_models import (
+from pipeline.train_and_evaluate_model import (
     CATEGORICAL_FEATURES,
     NUMERIC_FEATURES,
     TARGET_COLUMN,
@@ -142,12 +142,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         '--input',
         type=Path,
-        default=Path('03_output/step2_eda/step2_model_dataset.csv'),
+        default=Path(__file__).resolve().parents[1] / 'data' / 'processed' / 'model_dataset.csv',
     )
     parser.add_argument(
         '--output-dir',
         type=Path,
-        default=Path('03_output/development_optimization'),
+        default=Path(__file__).resolve().parents[1] / 'results' / 'development_experiments',
     )
     parser.add_argument('--test-start', default='2026-07-01')
     parser.add_argument('--validation-days', type=int, default=7)

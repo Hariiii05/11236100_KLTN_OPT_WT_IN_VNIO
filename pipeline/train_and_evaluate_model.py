@@ -42,6 +42,9 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OrdinalEncoder
 
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
 TIME_COLUMN = 'queue_entry_time'
 TARGET_COLUMN = 'waiting_minutes'
 GROUP_COLUMN = 'nb_dot_dieu_tri_id'
@@ -110,8 +113,16 @@ MODEL_SPECS = {
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Walk-forward modeling for HIS waiting time.')
     parser.add_argument('--stage', choices=['validate', 'final-test'], required=True)
-    parser.add_argument('--input', type=Path, default=Path('03_output/step2_eda/step2_model_dataset.csv'))
-    parser.add_argument('--output-dir', type=Path, default=Path('03_output/step3_modeling'))
+    parser.add_argument(
+        '--input',
+        type=Path,
+        default=PROJECT_ROOT / 'data' / 'processed' / 'model_dataset.csv',
+    )
+    parser.add_argument(
+        '--output-dir',
+        type=Path,
+        default=PROJECT_ROOT / 'results' / 'final_model',
+    )
     parser.add_argument('--test-start', default='2026-07-01')
     parser.add_argument('--validation-days', type=int, default=7)
     parser.add_argument('--n-folds', type=int, default=6)
@@ -174,7 +185,7 @@ def feature_audit_table() -> pd.DataFrame:
         ('ma_dich_vu', 'Danh mục dịch vụ đã đăng ký', 'Có trước hoặc tại queue_entry_time', True, 'Giữ một mã; không dùng đồng thời ID/tên trùng thông tin.'),
         ('ma_phong_thuc_hien', 'Phòng thực hiện', 'Được xác định khi vào hàng đợi', True, 'Cần thiết cho điều kiện vận hành theo phòng.'),
         ('ma_khoa_thuc_hien', 'Khoa của phòng', 'Được xác định khi vào hàng đợi', True, 'Thông tin tổ chức đã biết tại thời điểm dự báo.'),
-        ('queue_entry_status', 'Status 20 hoặc 40 dùng làm mốc', 'Chính là trigger dự báo', True, 'Phân biệt hai luồng nghiệp vụ target V2.'),
+        ('queue_entry_status', 'Status 20 hoặc 40 dùng làm mốc', 'Chính là trigger dự báo', True, 'Phân biệt hai luồng nghiệp vụ của target khám chính thức.'),
         ('uu_tien', 'Cờ ưu tiên', 'Đã có trong hàng đợi', True, 'Chỉ dùng nếu hệ thống vận hành giữ nguyên ý nghĩa hiện tại.'),
         ('cap_cuu', 'Cờ cấp cứu', 'Đã có trong hàng đợi', True, 'An toàn theo thời gian; có thể không có phương sai.'),
         ('stt', 'Số thứ tự hàng đợi', 'Đã cấp khi vào hàng đợi', True, 'Không dùng giá trị cập nhật sau queue_entry_time.'),

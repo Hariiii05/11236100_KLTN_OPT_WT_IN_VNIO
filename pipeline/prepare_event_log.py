@@ -10,6 +10,9 @@ from typing import Any
 import pandas as pd
 
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
 INPUT_FILES = {
     "encounter": "01_encounter.csv",
     "reception": "02_reception.csv",
@@ -240,10 +243,20 @@ def quality_report(frames: dict[str, pd.DataFrame]) -> pd.DataFrame:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input-dir", type=Path, default=Path("01_data_input"))
-    parser.add_argument("--output-dir", type=Path, default=Path("03_output"))
+    parser.add_argument("--input-dir", type=Path, default=PROJECT_ROOT / "data" / "raw")
+    parser.add_argument(
+        "--processed-dir",
+        type=Path,
+        default=PROJECT_ROOT / "data" / "processed",
+    )
+    parser.add_argument(
+        "--audit-dir",
+        type=Path,
+        default=PROJECT_ROOT / "results" / "audit",
+    )
     args = parser.parse_args()
-    args.output_dir.mkdir(parents=True, exist_ok=True)
+    args.processed_dir.mkdir(parents=True, exist_ok=True)
+    args.audit_dir.mkdir(parents=True, exist_ok=True)
 
     frames: dict[str, pd.DataFrame] = {}
     metadata = {}
@@ -255,11 +268,25 @@ def main() -> None:
         print(f"[ingest] loaded {name}: {len(frame):,} rows", flush=True)
 
     print("[quality] creating report", flush=True)
-    quality_report(frames).to_csv(args.output_dir / "data_quality_report.csv", index=False, encoding="utf-8-sig")
+    quality_report(frames).to_csv(
+        args.audit_dir / "data_quality_report.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
     print("[events] creating normalized event log", flush=True)
-    build_events(frames).to_csv(args.output_dir / "event_log_normalized.csv", index=False, encoding="utf-8-sig")
-    (args.output_dir / "ingestion_metadata.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
-    print("[done] outputs written to 03_output", flush=True)
+    event_log_path = args.processed_dir / "event_log.csv"
+    build_events(frames).to_csv(
+        event_log_path,
+        index=False,
+        encoding="utf-8-sig",
+    )
+    metadata_path = args.audit_dir / "ingestion_metadata.json"
+    metadata_path.write_text(
+        json.dumps(metadata, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    print(f"[done] event log: {event_log_path}", flush=True)
+    print(f"[done] audit outputs: {args.audit_dir}", flush=True)
 
 
 if __name__ == "__main__":

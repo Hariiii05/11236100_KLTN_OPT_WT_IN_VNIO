@@ -1,6 +1,6 @@
 # Nguồn SQL trích xuất dữ liệu HIS
 
-Tài liệu này lưu năm truy vấn nguồn dùng để tạo các file trong `01_data_input/`. Phạm vi thời gian hiện tại là từ `2026-04-01 00:00:00` đến trước `2026-08-01 00:00:00`.
+Tài liệu này lưu năm truy vấn nguồn dùng để tạo các file trong `data/raw/`. Phạm vi thời gian hiện tại là từ `2026-04-01 00:00:00` đến trước `2026-08-01 00:00:00`.
 
 ## Lưu ý trước khi chạy
 
@@ -448,7 +448,7 @@ ORDER BY
 
 ## File đầu ra tương ứng
 
-Sau khi chạy từng truy vấn, xuất đúng tên sau vào `01_data_input/`:
+Sau khi chạy từng truy vấn, xuất đúng tên sau vào `data/raw/`:
 
 ```text
 01_encounter.csv
@@ -458,10 +458,10 @@ Sau khi chạy từng truy vấn, xuất đúng tên sau vào `01_data_input/`:
 05_exam_status_log.csv
 ```
 
-Không đổi tên cột trong lúc export vì các script trong `02_processing/` sử dụng trực tiếp schema trên.
+Không đổi tên cột trong lúc export vì các script trong `pipeline/` sử dụng trực tiếp schema trên.
 
 ## 6. Truy vấn snapshot tùy chọn cho dự báo trực tiếp
 
-Truy vấn PostgreSQL tùy chọn để lấy các ca vừa vào đúng status hàng đợi được lưu tại [`SQL_queue_snapshot_for_prediction.sql`](SQL_queue_snapshot_for_prediction.sql). Output không chứa status `60`, target hoặc trường phát sinh sau thời điểm dự báo.
+Truy vấn PostgreSQL tùy chọn để lấy các ca vừa vào đúng status hàng đợi được lưu tại [`sql/queue_snapshot_for_prediction.sql`](sql/queue_snapshot_for_prediction.sql). Output không chứa status `60`, target hoặc trường phát sinh sau thời điểm dự báo.
 
 Truy vấn mặc định lấy cửa sổ năm phút theo dạng nửa kín `[from_time, to_time)`. Nếu sử dụng định kỳ, cần truyền hoặc lưu checkpoint `to_time` của lần chạy trước để các cửa sổ không hở và không chồng lặp. Một dịch vụ có thể vào lại hàng đợi; cặp `nb_dich_vu_id` + `queue_entry_time` là khóa sự kiện.
