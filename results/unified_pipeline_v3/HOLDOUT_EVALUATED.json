@@ -1,0 +1,136 @@
+{
+  "evaluated_at_utc": "2026-09-25T01:31:58.489632+00:00",
+  "dataset_sha256": "5e403895977ae7f299afb4e9cc31fec9365ea7a3b7a8576043f5116691be0628",
+  "cohort_rules": {
+    "exclude_service_codes": [
+      "KB008"
+    ],
+    "max_wait_minutes": 1440.0
+  },
+  "holdout_start": "2026-07-15 00:00:00",
+  "holdout_end": "2026-07-31 22:49:37.349000",
+  "holdout_calendar_days_with_data": 17,
+  "holdout_rows": 23080,
+  "selected_candidate": {
+    "name": "queue_dynamics_lunch_deeper",
+    "feature_set": "queue_dynamics_lunch",
+    "params": {
+      "loss": "absolute_error",
+      "learning_rate": 0.06,
+      "max_iter": 180,
+      "max_leaf_nodes": 63,
+      "min_samples_leaf": 30,
+      "l2_regularization": 1.0
+    }
+  },
+  "overall_metrics_raw": {
+    "mae": 9.516258230939396,
+    "rmse": 17.487873750007353,
+    "median_ae": 5.938528036823255,
+    "r2": 0.6293963387719759,
+    "p90_ae": 19.450150205518046,
+    "bias": -1.7936700861518222,
+    "within_10m_rate": 0.7126516464471404,
+    "within_20m_rate": 0.9051993067590988
+  },
+  "overall_metrics_calibrated": {
+    "mae": 9.517025736670577,
+    "rmse": 17.501401283347658,
+    "median_ae": 5.935124978294441,
+    "r2": 0.6288227650529007,
+    "p90_ae": 19.465200935255677,
+    "bias": -1.8372954292015133,
+    "within_10m_rate": 0.7137348353552859,
+    "within_20m_rate": 0.9053292894280762
+  },
+  "coverage_raw": {
+    "p50": 0.5211871750433276,
+    "p80": 0.7804159445407279
+  },
+  "coverage_calibrated": {
+    "p50": 0.5206239168110919,
+    "p80": 0.8139948006932409
+  },
+  "tail_summary_calibrated": {
+    "tail_threshold_minutes": 120.0,
+    "tail_rows": 199,
+    "tail_share_of_rows": 0.008622183708838821,
+    "tail_share_of_total_abs_error": 0.07673718181218231,
+    "tail_mae": 84.70124958222,
+    "tail_bias": -71.58345747646531,
+    "non_tail_mae": 8.863135585660379
+  },
+  "subgroup_errors": {
+    "v3_calibrated": {
+      "crosses_lunch": {
+        "rows": 134,
+        "mae": 63.52202118624152,
+        "bias": -59.67475502968287
+      },
+      "tail_gt_120": {
+        "rows": 199,
+        "mae": 84.70124958222,
+        "bias": -71.58345747646531
+      },
+      "non_tail_le_120": {
+        "rows": 22881,
+        "mae": 8.863135585660379,
+        "bias": -1.2307010387725332
+      }
+    },
+    "v1_frozen": {
+      "crosses_lunch": {
+        "rows": 134,
+        "mae": 87.13672403398853,
+        "bias": -85.36214656168409
+      },
+      "tail_gt_120": {
+        "rows": 199,
+        "mae": 105.02846349964496,
+        "bias": -74.62169617341038
+      },
+      "non_tail_le_120": {
+        "rows": 22881,
+        "mae": 9.746622599636694,
+        "bias": -0.6470715870978561
+      }
+    },
+    "v2_frozen": {
+      "crosses_lunch": {
+        "rows": 134,
+        "mae": 61.36235031360677,
+        "bias": -53.22679125575112
+      },
+      "tail_gt_120": {
+        "rows": 199,
+        "mae": 81.2203638615865,
+        "bias": -67.99274999870053
+      },
+      "non_tail_le_120": {
+        "rows": 22881,
+        "mae": 8.8720235547904,
+        "bias": -1.5070726430364327
+      }
+    }
+  },
+  "lunch_warning_holdout_report": {
+    "threshold": 0.2292204554569464,
+    "precision": 0.47391304347826085,
+    "recall": 0.8134328358208955,
+    "f1": 0.5989010989010989,
+    "positives_true": 134,
+    "positives_predicted": 230,
+    "rows": 18664
+  },
+  "lunch_warning_v2_frozen_same_rows": {
+    "threshold": 0.2371408900536268,
+    "precision": 0.45901639344262296,
+    "recall": 0.835820895522388,
+    "f1": 0.5925925925925926,
+    "positives_true": 134,
+    "positives_predicted": 244,
+    "rows": 18664
+  },
+  "lunch_threshold": 0.2292204554569464,
+  "warning": "Holdout has been evaluated. Do not use these results for further feature, model, or hyperparameter selection."
+}

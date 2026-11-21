@@ -35,6 +35,8 @@ from pipeline.train_and_evaluate_model import (
     NUMERIC_FEATURES,
     TARGET_COLUMN,
     TIME_COLUMN,
+    SERVICE_COMPLETION_COLUMN,
+    SERVICE_DURATION_COLUMN,
     calculate_metrics,
     dataset_sha256,
     load_dataset,
@@ -69,6 +71,15 @@ HISTORY_FEATURES = [
     'service_wait_logmean_42d',
     'global_completed_7d_count',
     'global_wait_logmean_7d',
+]
+
+SERVICE_DURATION_FEATURES = [
+    'room_exam_duration_completed_42d_count',
+    'room_exam_duration_logmean_42d',
+    'service_exam_duration_completed_42d_count',
+    'service_exam_duration_logmean_42d',
+    'global_exam_duration_completed_7d_count',
+    'global_exam_duration_logmean_7d',
 ]
 
 CURRENT_PARAMS = {
@@ -122,6 +133,18 @@ CANDIDATES = [
     Candidate('queue_absolute', 'queue', 'none', CURRENT_PARAMS),
     Candidate('queue_dynamics_absolute', 'queue_dynamics', 'none', CURRENT_PARAMS),
     Candidate('queue_dynamics_deeper', 'queue_dynamics', 'none', DEEPER_PARAMS),
+    Candidate(
+        'queue_dynamics_service_duration_absolute',
+        'queue_dynamics_service_duration',
+        'none',
+        CURRENT_PARAMS,
+    ),
+    Candidate(
+        'queue_dynamics_service_duration_deeper',
+        'queue_dynamics_service_duration',
+        'none',
+        DEEPER_PARAMS,
+    ),
     Candidate(
         'queue_dynamics_quantile55',
         'queue_dynamics',
@@ -303,8 +326,77 @@ def causal_completed_history(
     return counts, means
 
 
+def causal_service_duration_history(
+    data: pd.DataFrame,
+    group_column: str | None,
+    window_days: int,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Use only 60->150 durations completed strictly before each prediction."""
+    counts = np.zeros(len(data), dtype=np.int32)
+    means = np.full(len(data), np.nan, dtype=float)
+    queue_ns = data[TIME_COLUMN].astype('int64').to_numpy()
+    completion = pd.to_datetime(data[SERVICE_COMPLETION_COLUMN], errors='coerce')
+    duration = pd.to_numeric(data[SERVICE_DURATION_COLUMN], errors='coerce')
+    valid_event = (
+        completion.notna() & duration.notna() & duration.ge(0)
+    ).to_numpy(dtype=bool)
+    completed_ns = completion.astype('int64').to_numpy()
+    values = np.log1p(duration.clip(lower=0).fillna(0).to_numpy(dtype=float))
+    window_ns = int(pd.Timedelta(window_days, unit='D').value)
+
+    if group_column is None:
+        grouped_positions = [np.arange(len(data), dtype=np.int64)]
+    else:
+        groups = data[group_column].astype('string').fillna('__MISSING__')
+        grouped_positions = [
+            np.asarray(positions, dtype=np.int64)
+            for positions in data.groupby(groups, sort=False).indices.values()
+        ]
+
+    for query_positions in grouped_positions:
+        query_positions = query_positions[
+            np.argsort(queue_ns[query_positions], kind='stable')
+        ]
+        completion_positions = query_positions[valid_event[query_positions]]
+        completion_positions = completion_positions[
+            np.argsort(completed_ns[completion_positions], kind='stable')
+        ]
+        completion_times = completed_ns[completion_positions]
+        completion_values = values[completion_positions]
+        left = 0
+        right = 0
+        running_sum = 0.0
+        for position in query_positions:
+            query_time = queue_ns[position]
+            while (
+                right < len(completion_positions)
+                and completion_times[right] < query_time
+            ):
+                running_sum += float(completion_values[right])
+                right += 1
+            cutoff = query_time - window_ns
+            while left < right and completion_times[left] < cutoff:
+                running_sum -= float(completion_values[left])
+                left += 1
+            count = right - left
+            counts[position] = count
+            if count:
+                means[position] = float(np.expm1(running_sum / count))
+    return counts, means
+
+
 def add_causal_features(development: pd.DataFrame) -> pd.DataFrame:
     data = development.copy().reset_index(drop=True)
+    required_service_columns = {
+        SERVICE_COMPLETION_COLUMN,
+        SERVICE_DURATION_COLUMN,
+    }
+    missing_service_columns = sorted(required_service_columns - set(data.columns))
+    if missing_service_columns:
+        raise ValueError(
+            'Missing status 60->150 auxiliary columns: '
+            f'{missing_service_columns}. Rebuild the target and model dataset.'
+        )
     for minutes in (15, 30, 60):
         data[f'room_arrivals_last_{minutes}m'] = grouped_prior_arrival_count(
             data, 'ma_phong_thuc_hien', minutes
@@ -343,17 +435,32 @@ def add_causal_features(development: pd.DataFrame) -> pd.DataFrame:
         counts, means = causal_completed_history(data, group_column, days)
         data[f'{prefix}_completed_{days}d_count'] = counts
         data[f'{prefix}_wait_logmean_{days}d'] = means
+
+    service_history_specs = [
+        ('ma_phong_thuc_hien', 42, 'room'),
+        ('ma_dich_vu', 42, 'service'),
+        (None, 7, 'global'),
+    ]
+    for group_column, days, prefix in service_history_specs:
+        counts, means = causal_service_duration_history(data, group_column, days)
+        data[f'{prefix}_exam_duration_completed_{days}d_count'] = counts
+        data[f'{prefix}_exam_duration_logmean_{days}d'] = means
     return data
 
 
 def feature_columns(feature_set: str) -> tuple[list[str], list[str]]:
     numeric = list(NUMERIC_FEATURES)
-    if feature_set in {'queue', 'queue_dynamics', 'queue_history'}:
+    queue_sets = {
+        'queue', 'queue_dynamics', 'queue_history', 'queue_dynamics_service_duration'
+    }
+    if feature_set in queue_sets:
         numeric.extend(QUEUE_FEATURES)
-    if feature_set == 'queue_dynamics':
+    if feature_set in {'queue_dynamics', 'queue_dynamics_service_duration'}:
         numeric.extend(DYNAMICS_FEATURES)
     if feature_set == 'queue_history':
         numeric.extend(HISTORY_FEATURES)
+    if feature_set == 'queue_dynamics_service_duration':
+        numeric.extend(SERVICE_DURATION_FEATURES)
     return list(CATEGORICAL_FEATURES), numeric
 
 
@@ -541,6 +648,11 @@ def main() -> None:
             'history_features': (
                 'Only waits with label_available_time strictly before each prediction '
                 'time contribute to rolling statistics.'
+            ),
+            'service_duration_features': (
+                'Durations are measured from status 60 to status 150. Only exams '
+                'whose status 150 occurred strictly before prediction time '
+                'contribute to rolling counts and log-means.'
             ),
         },
         'warning': (

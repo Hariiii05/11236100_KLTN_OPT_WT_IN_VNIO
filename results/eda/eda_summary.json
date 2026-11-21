@@ -1,5 +1,5 @@
 {
-  "input": "C:\\Khoá luận\\Code\\03_output\\exam_wait_target_v2.csv",
+  "input": "C:\\Khoá luận\\Code\\data\\processed\\exam_wait_target_all.csv",
   "exam_rows_all": 170216,
   "unique_service_ids": 170216,
   "valid_target_rows_used_for_eda": 141519,
@@ -86,5 +86,10 @@
     "queue_entry_month",
     "order_to_queue_minutes"
   ],
-  "group_minimum_rows": 30
+  "group_minimum_rows": 30,
+  "model_auxiliary_columns": [
+    "exam_complete_time",
+    "service_minutes_60_to_150",
+    "service_duration_valid_60_to_150"
+  ]
 }

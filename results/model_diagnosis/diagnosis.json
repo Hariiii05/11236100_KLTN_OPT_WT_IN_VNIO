@@ -1,0 +1,9 @@
+{
+  "scope": "development_only_no_final_test_evaluation",
+  "input_sha256": "5e403895977ae7f299afb4e9cc31fec9365ea7a3b7a8576043f5116691be0628",
+  "test_start_exclusive_boundary": "2026-07-01 00:00:00",
+  "development_rows": 100214,
+  "best_uncalibrated_candidate": "queue_dynamics",
+  "in_exam_cap_minutes": 240,
+  "note": "Doctor identity is used only through completed cases (known at status 150); live roster uses status-60 audit-log accounts."
+}

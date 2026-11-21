@@ -13,6 +13,9 @@
     "has_status_40_before_60": 138621,
     "uses_status20_target": 3101,
     "uses_status40_target": 167115,
+    "has_status_150": 162143,
+    "has_status_150_after_60": 162017,
+    "valid_service_duration_60_to_150": 162017,
     "valid_target_v2": 141519,
     "valid_rate": 0.8314083282417634,
     "median_waiting_minutes": 15.82125,
@@ -24,7 +27,9 @@
     "waiting_gt_24h": 77,
     "cross_day_wait": 123,
     "missing_required_status_20": 0,
-    "missing_required_status_40": 25787
+    "missing_required_status_40": 25787,
+    "median_service_minutes_60_to_150": 34.704683333333335,
+    "p90_service_minutes_60_to_150": 146.18050333333332
   },
   "joins": [
     {

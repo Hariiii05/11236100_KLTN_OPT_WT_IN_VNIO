@@ -1,0 +1,67 @@
+{
+  "evaluated_at_utc": "2026-09-23T03:55:38.434807+00:00",
+  "dataset_sha256": "5e403895977ae7f299afb4e9cc31fec9365ea7a3b7a8576043f5116691be0628",
+  "holdout_start": "2026-07-15 00:00:00",
+  "holdout_end": "2026-08-04 10:19:34.286000",
+  "holdout_rows": 23450,
+  "selected_candidate": {
+    "name": "queue_dynamics_lunch_deeper",
+    "feature_set": "queue_dynamics_lunch",
+    "params": {
+      "loss": "absolute_error",
+      "learning_rate": 0.06,
+      "max_iter": 180,
+      "max_leaf_nodes": 63,
+      "min_samples_leaf": 30,
+      "l2_regularization": 1.0
+    }
+  },
+  "overall_metrics_raw": {
+    "mae": 15.175823667942147,
+    "rmse": 322.54589565694835,
+    "median_ae": 5.990155881303116,
+    "r2": 0.004978395800991464,
+    "p90_ae": 20.273945125444147,
+    "bias": -7.659740001344449,
+    "within_10m_rate": 0.7067803837953092,
+    "within_20m_rate": 0.8976119402985074
+  },
+  "overall_metrics_calibrated": {
+    "mae": 15.179246155126743,
+    "rmse": 322.5413460711332,
+    "median_ae": 6.010908306977587,
+    "r2": 0.005006465631117729,
+    "p90_ae": 20.14949321265071,
+    "bias": -7.463361718868273,
+    "within_10m_rate": 0.7072068230277185,
+    "within_20m_rate": 0.8983368869936034
+  },
+  "coverage_raw": {
+    "p50": 0.5047761194029851,
+    "p80": 0.7755650319829425
+  },
+  "coverage_calibrated": {
+    "p50": 0.5146695095948828,
+    "p80": 0.8129211087420043
+  },
+  "tail_summary_calibrated": {
+    "tail_threshold_minutes": 120.0,
+    "tail_rows": 240,
+    "tail_share_of_rows": 0.01023454157782516,
+    "tail_share_of_total_abs_error": 0.4100543332428348,
+    "tail_mae": 608.1675094031938,
+    "tail_bias": -597.5141843719656,
+    "non_tail_mae": 9.04752779323376
+  },
+  "lunch_warning_holdout_report": {
+    "threshold": 0.2371408900536268,
+    "precision": 0.4375,
+    "recall": 0.7924528301886793,
+    "f1": 0.5637583892617449,
+    "positives_true": 159,
+    "positives_predicted": 288,
+    "rows": 18989
+  },
+  "lunch_threshold": 0.2371408900536268,
+  "warning": "Holdout has been evaluated. Do not use these results for further feature, model, or hyperparameter selection."
+}

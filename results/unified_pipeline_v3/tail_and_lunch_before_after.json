@@ -1,0 +1,26 @@
+{
+  "before_official_current": {
+    "tail_threshold_minutes": 120.0,
+    "tail_rows": 578,
+    "tail_share_of_rows": 0.01117556071152359,
+    "tail_share_of_total_abs_error": 0.08420130631154904,
+    "tail_mae": 76.40031203695872,
+    "tail_bias": -68.61224677009271,
+    "non_tail_mae": 9.391315985666177,
+    "crosses_lunch_mae": 63.71504737952829,
+    "crosses_lunch_bias": -61.995228788592314,
+    "crosses_lunch_rows": 359
+  },
+  "after_queue_dynamics_lunch_deeper": {
+    "tail_threshold_minutes": 120.0,
+    "tail_rows": 578,
+    "tail_share_of_rows": 0.01117556071152359,
+    "tail_share_of_total_abs_error": 0.08065701701483764,
+    "tail_mae": 67.50490930818613,
+    "tail_bias": -57.25818768665808,
+    "non_tail_mae": 8.696027371627839,
+    "crosses_lunch_mae": 53.92141308361952,
+    "crosses_lunch_bias": -52.3654952700184,
+    "crosses_lunch_rows": 359
+  }
+}

@@ -272,7 +272,11 @@ def build_target(paths: dict[str, Path]):
         for k, v in chunk['status_name'].fillna('<NA>').value_counts().items():
             status_name_counter[str(k)] += int(v)
 
-        keep = curr.isin([20,40,60])
+        # Status 150 marks a completed examination. It is retained so service
+        # duration can be measured from the first status 60 to the first
+        # subsequent status 150. This auxiliary value is never a predictor for
+        # its own row.
+        keep = curr.isin([20,40,60,150])
         x = chunk.loc[keep, ['nb_dich_vu_id','nb_dot_dieu_tri_id','thoi_gian_thay_doi_ban_ghi','trang_thai']].copy()
         x['nb_dich_vu_id'] = pd.to_numeric(x['nb_dich_vu_id'], errors='coerce').astype('Int64')
         x['nb_dot_dieu_tri_id'] = pd.to_numeric(x['nb_dot_dieu_tri_id'], errors='coerce').astype('Int64')
@@ -300,6 +304,20 @@ def build_target(paths: dict[str, Path]):
     any40 = set(ev.loc[ev.trang_thai.eq(40),'nb_dich_vu_id'].unique().tolist())
     any60 = set(first60['nb_dich_vu_id'].tolist())
     any20 = set(first20['nb_dich_vu_id'].tolist())
+    any150 = set(ev.loc[ev.trang_thai.eq(150),'nb_dich_vu_id'].unique().tolist())
+
+    status150_after60 = (
+        ev.loc[ev.trang_thai.eq(150), ['nb_dich_vu_id', 'event_time']]
+        .merge(first60, on='nb_dich_vu_id', how='inner')
+    )
+    status150_after60 = status150_after60.loc[
+        status150_after60['event_time'] >= status150_after60['exam_start_time']
+    ]
+    first150_after60 = (
+        status150_after60.groupby('nb_dich_vu_id', as_index=False)['event_time']
+        .min()
+        .rename(columns={'event_time': 'exam_complete_time'})
+    )
 
     s20 = ev.loc[ev.trang_thai.eq(20), ['nb_dich_vu_id','event_time']].merge(first60, on='nb_dich_vu_id', how='inner')
     s20 = s20.loc[s20['event_time'] <= s20['exam_start_time']]
@@ -328,12 +346,22 @@ def build_target(paths: dict[str, Path]):
     target = target.merge(first20, on='nb_dich_vu_id', how='left')
     target = target.merge(latest20, on='nb_dich_vu_id', how='left')
     target = target.merge(latest40, on='nb_dich_vu_id', how='left')
+    target = target.merge(first150_after60, on='nb_dich_vu_id', how='left')
     target['has_status_20_any'] = target['nb_dich_vu_id'].isin(any20)
     target['has_status_40_any'] = target['nb_dich_vu_id'].isin(any40)
     target['has_status_60_any'] = target['nb_dich_vu_id'].isin(any60)
+    target['has_status_150_any'] = target['nb_dich_vu_id'].isin(any150)
+    target['has_status_150_after_60'] = target['exam_complete_time'].notna()
     target['has_status_20_before_60'] = target['latest_status20_before60_time'].notna()
     target['has_status_40_before_60'] = target['latest_status40_before60_time'].notna()
 
+    target['service_minutes_60_to_150'] = (
+        target['exam_complete_time'] - target['exam_start_time']
+    ).dt.total_seconds() / 60.0
+    target['service_duration_valid_60_to_150'] = (
+        target['service_minutes_60_to_150'].notna()
+        & target['service_minutes_60_to_150'].ge(0)
+    )
     service_code = target['ma_dich_vu'].astype('string').str.strip().str.upper()
     room_code = target['ma_phong_thuc_hien'].astype('string').str.strip().str.upper()
     target['uses_status20_target'] = service_code.eq('KB008') | room_code.eq('H401')
@@ -391,6 +419,9 @@ def target_validation_tables(target: pd.DataFrame):
         ('has_status_60_any', int(target['has_status_60_any'].sum()), float(target['has_status_60_any'].mean())),
         ('has_status_40_before_60', int(target['has_status_40_before_60'].sum()), float(target['has_status_40_before_60'].mean())),
         ('uses_status20_target', int(target['uses_status20_target'].sum()), float(target['uses_status20_target'].mean())),
+        ('has_status_150_any', int(target['has_status_150_any'].sum()), float(target['has_status_150_any'].mean())),
+        ('has_status_150_after_60', int(target['has_status_150_after_60'].sum()), float(target['has_status_150_after_60'].mean())),
+        ('valid_service_duration_60_to_150', int(target['service_duration_valid_60_to_150'].sum()), float(target['service_duration_valid_60_to_150'].mean())),
         ('valid_target_v2', n_valid, n_valid/total if total else np.nan),
         ('waiting_eq_0', int(valid.eq(0).sum()), float(valid.eq(0).mean()) if n_valid else np.nan),
         ('waiting_gt_2h', int(valid.gt(120).sum()), float(valid.gt(120).mean()) if n_valid else np.nan),
@@ -462,6 +493,18 @@ def build_business_checks(paths: dict[str, Path], target: pd.DataFrame) -> tuple
     valid = target.loc[target['target_valid_v2']]
     rows.append({'check':'Target khám: valid theo quy tắc nghiệp vụ','value':int(len(valid)),'rate':float(len(valid)/len(target)) if len(target) else np.nan,'interpretation':'KB008 hoặc phòng H401 dùng 20 -> 60; các ca còn lại dùng 40 -> 60.'})
     rows.append({'check':'Target khám: waiting > 24h','value':int(valid['waiting_minutes'].gt(1440).sum()),'rate':float(valid['waiting_minutes'].gt(1440).mean()),'interpretation':'Trường hợp thực tế; giữ nguyên trong dữ liệu và gắn cờ để báo cáo.'})
+    valid_service = target.loc[
+        target['service_duration_valid_60_to_150'], 'service_minutes_60_to_150'
+    ]
+    rows.append({
+        'check': 'Exam duration: valid status 60 -> 150',
+        'value': int(len(valid_service)),
+        'rate': float(len(valid_service) / len(target)) if len(target) else np.nan,
+        'interpretation': (
+            'Only completed exams with status 150 before prediction time may '
+            'contribute to rolling history; future duration is never used.'
+        ),
+    })
     return pd.DataFrame(rows), arrival_hour_dist, service_type_dist
 
 def _safe_sheet_name(name: str) -> str:
@@ -573,7 +616,7 @@ def main(
     business_checks, arrival_hour_dist, service_type_dist = build_business_checks(paths, target)
     top_wait_outliers = (target.loc[target['target_valid_v2']]
         .sort_values('waiting_minutes', ascending=False)
-        .head(100)[['nb_dich_vu_id','nb_dot_dieu_tri_id','target_rule','queue_entry_status','queue_entry_time','exam_start_time','waiting_minutes','phong_thuc_hien_id','ma_phong_thuc_hien','bac_si_kham_id','ma_bac_si_kham','cross_day_wait']])
+        .head(100)[['nb_dich_vu_id','nb_dot_dieu_tri_id','target_rule','queue_entry_status','queue_entry_time','exam_start_time','exam_complete_time','waiting_minutes','service_minutes_60_to_150','phong_thuc_hien_id','ma_phong_thuc_hien','bac_si_kham_id','ma_bac_si_kham','cross_day_wait']])
 
     target_path = processed_dir / 'exam_wait_target_all.csv'
     target.to_csv(target_path, index=False, encoding='utf-8-sig', date_format='%Y-%m-%d %H:%M:%S.%f')
@@ -590,6 +633,7 @@ def main(
         ('Quy tắc valid', 'Có status bắt buộc theo đúng nhánh nghiệp vụ trước status 60 và waiting_minutes >= 0.'),
         ('Outlier', 'Các ca >2h, >4h, >24h và cross-day là trường hợp thực tế; giữ nguyên và gắn cờ để báo cáo.'),
         ('Định dạng nguồn', '5 file gốc mang tên .csv nhưng bytes là workbook XLSX; pipeline chuẩn hóa thành CSV trung gian trước phân tích.'),
+        ('Service duration', 'service_minutes_60_to_150 is the first status 150 after the first status 60, minus status 60. Only exams completed before prediction time contribute to historical features.'),
     ]
     tables = {
         'dataset_summary': dataset_summary,
@@ -620,6 +664,9 @@ def main(
             'has_status_40_before_60': int(target.has_status_40_before_60.sum()),
             'uses_status20_target': int(target.uses_status20_target.sum()),
             'uses_status40_target': int((~target.uses_status20_target).sum()),
+            'has_status_150': int(target.has_status_150_any.sum()),
+            'has_status_150_after_60': int(target.has_status_150_after_60.sum()),
+            'valid_service_duration_60_to_150': int(target.service_duration_valid_60_to_150.sum()),
             'valid_target_v2': int(target.target_valid_v2.sum()),
             'valid_rate': float(target.target_valid_v2.mean()),
             'median_waiting_minutes': float(valid.median()) if len(valid) else None,
@@ -632,6 +679,14 @@ def main(
             'cross_day_wait': int(target.loc[target.target_valid_v2,'cross_day_wait'].sum()),
             'missing_required_status_20': int((target.has_status_60_any & target.uses_status20_target & ~target.has_status_20_before_60).sum()),
             'missing_required_status_40': int((target.has_status_60_any & ~target.uses_status20_target & ~target.has_status_40_before_60).sum()),
+            'median_service_minutes_60_to_150': (
+                float(target.loc[target.service_duration_valid_60_to_150, 'service_minutes_60_to_150'].median())
+                if target.service_duration_valid_60_to_150.any() else None
+            ),
+            'p90_service_minutes_60_to_150': (
+                float(target.loc[target.service_duration_valid_60_to_150, 'service_minutes_60_to_150'].quantile(.90))
+                if target.service_duration_valid_60_to_150.any() else None
+            ),
         },
         'joins': join_audit.to_dict(orient='records'),
     }

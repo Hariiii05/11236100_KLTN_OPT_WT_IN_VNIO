@@ -13,9 +13,14 @@ data/processed/
 # Row-level reports, predictions, and archived datasets
 results/eda/tables/
 results/final_model/final_test_predictions.csv
+results/unified_pipeline/holdout_patient_outputs.csv
+results/unified_pipeline_v3/holdout_patient_outputs.csv
 results/archive/
 
 # Local logs and operating-system files
 *.log
 .DS_Store
 Thumbs.db
+
+# Web app runtime state: replay cache (row-level HIS data) and demo reception database
+webapp/cache/

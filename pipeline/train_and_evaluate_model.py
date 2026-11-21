@@ -48,6 +48,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 TIME_COLUMN = 'queue_entry_time'
 TARGET_COLUMN = 'waiting_minutes'
 GROUP_COLUMN = 'nb_dot_dieu_tri_id'
+SERVICE_COMPLETION_COLUMN = 'exam_complete_time'
+SERVICE_DURATION_COLUMN = 'service_minutes_60_to_150'
 
 CATEGORICAL_FEATURES = [
     'ma_dich_vu',
@@ -157,6 +159,10 @@ def load_dataset(path: Path) -> pd.DataFrame:
 
     data[TIME_COLUMN] = pd.to_datetime(data[TIME_COLUMN], errors='coerce')
     data[TARGET_COLUMN] = pd.to_numeric(data[TARGET_COLUMN], errors='coerce')
+    if SERVICE_COMPLETION_COLUMN in data:
+        data[SERVICE_COMPLETION_COLUMN] = pd.to_datetime(data[SERVICE_COMPLETION_COLUMN], errors='coerce')
+    if SERVICE_DURATION_COLUMN in data:
+        data[SERVICE_DURATION_COLUMN] = pd.to_numeric(data[SERVICE_DURATION_COLUMN], errors='coerce')
     data = data.loc[data[TIME_COLUMN].notna() & data[TARGET_COLUMN].notna() & data[TARGET_COLUMN].ge(0)].copy()
 
     # The label becomes observable only when status 60 occurs.

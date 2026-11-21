@@ -1,7 +1,7 @@
 {
-  "created_at_utc": "2026-09-12T14:34:39.718275+00:00",
+  "created_at_utc": "2026-09-15T15:24:24.274727+00:00",
   "scope": "development_only_no_final_test_evaluation",
-  "input_sha256": "96eb8d0a3657fe224eb08e4034ab585590f980af3ce36dbc5e267daa4cdfec50",
+  "input_sha256": "5e403895977ae7f299afb4e9cc31fec9365ea7a3b7a8576043f5116691be0628",
   "test_start_exclusive_boundary": "2026-07-01 00:00:00",
   "development_rows": 100214,
   "validation_folds": 6,
@@ -95,7 +95,8 @@
   },
   "feature_availability": {
     "queue_features": "Counts use only queue entries strictly before each prediction time. Active queue size is reconstructable from current queue state.",
-    "history_features": "Only waits with label_available_time strictly before each prediction time contribute to rolling statistics."
+    "history_features": "Only waits with label_available_time strictly before each prediction time contribute to rolling statistics.",
+    "service_duration_features": "Durations are measured from status 60 to status 150. Only exams whose status 150 occurred strictly before prediction time contribute to rolling counts and log-means."
   },
   "warning": "This experiment does not establish improved Final Test performance. The locked Final Test was not evaluated or overwritten."
 }
