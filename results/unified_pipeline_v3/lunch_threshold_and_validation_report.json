@@ -1,0 +1,20 @@
+{
+  "threshold_selection": {
+    "threshold": 0.2292204554569464,
+    "precision": 0.7170868347338936,
+    "recall": 0.713091922005571,
+    "f_beta": 0.7150837988826816
+  },
+  "validation_report": {
+    "threshold": 0.2292204554569464,
+    "precision": 0.7170868347338936,
+    "recall": 0.713091922005571,
+    "f1": 0.7150837988826816,
+    "positives_true": 359,
+    "positives_predicted": 357,
+    "rows": 42002
+  },
+  "base_rate_positive": 0.008547212037522022,
+  "morning_validation_rows": 42002,
+  "fbeta_used": 1.0
+}

@@ -1,0 +1,20 @@
+{
+  "locked_at_utc": "2026-09-25T01:20:42.518342+00:00",
+  "input": "C:\\Khoá luận\\Code\\data\\processed\\model_dataset.csv",
+  "dataset_sha256": "5e403895977ae7f299afb4e9cc31fec9365ea7a3b7a8576043f5116691be0628",
+  "cohort_rules": {
+    "exclude_service_codes": [
+      "KB008"
+    ],
+    "max_wait_minutes": 1440.0
+  },
+  "holdout_start_source": "config",
+  "holdout_days_configured": 21,
+  "holdout_start": "2026-07-15 00:00:00",
+  "holdout_end": "2026-07-31 22:49:37.349000",
+  "holdout_calendar_days_with_data": 17,
+  "pre_holdout_rows": 115511,
+  "holdout_rows": 23080,
+  "overlapping_encounters": 0,
+  "note": "Holdout locked immediately after the time-based split. It must be used only once, at the final evaluation stage, and never for feature selection, hyperparameter search, or calibration fitting."
+}

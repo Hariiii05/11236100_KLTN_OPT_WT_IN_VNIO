@@ -1,0 +1,95 @@
+{
+  "input": "C:\\Khoá luận\\Code\\data\\processed\\exam_wait_target_all.csv",
+  "exam_rows_all": 170216,
+  "unique_service_ids": 170216,
+  "valid_target_rows_used_for_eda": 141519,
+  "valid_target_rate": 0.8314083282417634,
+  "waiting_minutes": {
+    "mean": 29.30134424765108,
+    "median": 15.82125,
+    "p90": 48.10303999999999,
+    "p95": 66.17648166666667,
+    "p99": 135.09405033333385,
+    "max": 47144.07726666667
+  },
+  "over_2h_count": 1804,
+  "over_4h_count": 506,
+  "over_24h_count": 77,
+  "cross_day_count": 123,
+  "status20_target_rows": 2898,
+  "status40_target_rows": 138621,
+  "missing_required_queue_status": 25787,
+  "missing_required_status40_with_status20_before60": 25767,
+  "peak_median_hour": 4,
+  "peak_median_hour_minutes": 53.36803333333333,
+  "highest_median_room_min_30": {
+    "room_name": "Khám nội H401",
+    "exam_count": 2525,
+    "median_minutes": 46.42393333333334
+  },
+  "outlier_sensitivity": [
+    {
+      "scenario": "Toàn bộ valid",
+      "retained_rows": 141519,
+      "retained_rate": 1.0,
+      "mean_minutes": 29.30134424765108,
+      "median_minutes": 15.82125,
+      "p95_minutes": 66.17648166666667
+    },
+    {
+      "scenario": "Không quá 24 giờ",
+      "retained_rows": 141442,
+      "retained_rate": 0.9994559034475936,
+      "mean_minutes": 23.498412030137207,
+      "median_minutes": 15.811458333333334,
+      "p95_minutes": 65.84209916666666
+    },
+    {
+      "scenario": "Không quá 4 giờ",
+      "retained_rows": 141013,
+      "retained_rate": 0.9964245083699008,
+      "mean_minutes": 22.217356622084488,
+      "median_minutes": 15.753033333333333,
+      "p95_minutes": 64.22614333333331
+    },
+    {
+      "scenario": "Không quá 2 giờ",
+      "retained_rows": 139715,
+      "retained_rate": 0.9872525950579074,
+      "mean_minutes": 20.948633708978992,
+      "median_minutes": 15.584283333333332,
+      "p95_minutes": 60.10126166666666
+    }
+  ],
+  "baseline_feature_columns": [
+    "nb_dich_vu_id",
+    "nb_dot_dieu_tri_id",
+    "dich_vu_id",
+    "ma_dich_vu",
+    "ten_dich_vu",
+    "phong_thuc_hien_id",
+    "ma_phong_thuc_hien",
+    "khoa_thuc_hien_id",
+    "ma_khoa_thuc_hien",
+    "bac_si_kham_id",
+    "ma_bac_si_kham",
+    "stt",
+    "uu_tien",
+    "cap_cuu",
+    "queue_entry_status",
+    "thoi_gian_chi_dinh",
+    "queue_entry_time",
+    "queue_entry_date",
+    "queue_entry_hour",
+    "queue_entry_day_of_week",
+    "queue_entry_is_weekend",
+    "queue_entry_month",
+    "order_to_queue_minutes"
+  ],
+  "group_minimum_rows": 30,
+  "model_auxiliary_columns": [
+    "exam_complete_time",
+    "service_minutes_60_to_150",
+    "service_duration_valid_60_to_150"
+  ]
+}

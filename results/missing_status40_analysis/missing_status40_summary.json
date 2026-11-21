@@ -1,0 +1,81 @@
+{
+  "inputs": {
+    "target": "C:\\Khoá luận\\Source\\data\\processed\\exam_wait_target_all.csv",
+    "status_log": "C:\\Khoá luận\\Source\\data\\intermediate\\05_exam_status_log.csv",
+    "holdout_outputs": "C:\\Khoá luận\\Source\\results\\unified_pipeline_v3\\holdout_patient_outputs.csv"
+  },
+  "funnel": {
+    "exam_services_total": 170216,
+    "no_status60": 2910,
+    "status20_branch_kb008_h401": 2898,
+    "missing_required_status40": 25787,
+    "has_status40_and_status60": 138621,
+    "valid_target_audit": 141519,
+    "removed_wait_over_limit_in_status40_branch": 30,
+    "v3_modelling_cohort": 138591
+  },
+  "coverage": {
+    "valid_target_audit_pct": 0.8314083282417634,
+    "v3_cohort_pct": 0.8142066550735536,
+    "missing_status40_pct_of_all": 0.15149574658081497,
+    "top5_rooms_share_of_missing_status40": 0.5093264047776012,
+    "top10_rooms_share_of_missing_status40": 0.6885640051188583
+  },
+  "glaucoma_rooms": {
+    "rooms": 8,
+    "missing_status40_rate_of_started": 0.2633393624236943,
+    "by_room": {
+      "PK-3": 0.042423213982691325,
+      "PK-4": 0.017217217217217216,
+      "GlC502": 0.940536013400335,
+      "PK-38": 0.29928198433420367
+    }
+  },
+  "within_room_timing": {
+    "rooms_compared": 31,
+    "rooms_missing_20_to_60_above_has40_40_to_60": 30,
+    "rooms_missing_20_to_60_within_20pct_of_has40_20_to_60": 14
+  },
+  "start_screen_share_do_thi_luc": {
+    "has_status40": 0.9031027044964327,
+    "missing_status40": 0.8797843874820646
+  },
+  "holdout_mae": {
+    "observed_holdout_rows": 23080,
+    "observed_mae": 9.517168707394571,
+    "post_stratified_mae": 9.960965529611796,
+    "difference_minutes": 0.44379682221722483,
+    "population_rows": 27440,
+    "population_rows_missing_status40": 4360,
+    "share_population_in_unrepresented_rooms": 0.007361516034985423,
+    "min_observed_per_room": 30,
+    "scenarios": [
+      {
+        "mae_multiplier_on_missing_status40_rows": 1.0,
+        "overall_mae": 9.960965529611798
+      },
+      {
+        "mae_multiplier_on_missing_status40_rows": 1.25,
+        "overall_mae": 10.452938683498214
+      },
+      {
+        "mae_multiplier_on_missing_status40_rows": 1.5,
+        "overall_mae": 10.944911837384629
+      },
+      {
+        "mae_multiplier_on_missing_status40_rows": 2.0,
+        "overall_mae": 11.92885814515746
+      }
+    ],
+    "observed_rows_match_population_with_status40": true
+  },
+  "load_features": {
+    "cohort_rows_rebuilt": 138591,
+    "window_minutes": 30,
+    "overall_arrivals_undercount_pct": 10.117204031749594,
+    "overall_patients_ahead_undercount_pct": 24.460915941742044,
+    "rebuilt_rows_match_v3_cohort": true,
+    "cohort_share_in_rooms_missing_ge_30pct": 0.1276994898658643,
+    "cohort_share_in_rooms_missing_ge_10pct": 0.2501966217142527
+  }
+}

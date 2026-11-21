@@ -1,0 +1,5 @@
+﻿step,all,pre_holdout,holdout
+input_rows,141519,118069,23450
+removed_excluded_service:KB008,2898,2530,368
+removed_wait_over_limit:>1440.0min (additional to service rule),30,28,2
+kept_rows,138591,115511,23080

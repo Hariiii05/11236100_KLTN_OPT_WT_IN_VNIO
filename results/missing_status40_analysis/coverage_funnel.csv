@@ -1,0 +1,9 @@
+﻿step,services,pct_of_all_services
+exam_services_total,170216,1.0
+no_status60,2910,0.017095925177421627
+status20_branch_kb008_h401,2898,0.01702542651689618
+missing_required_status40,25787,0.15149574658081497
+has_status40_and_status60,138621,0.8143829017248673
+valid_target_audit,141519,0.8314083282417634
+removed_wait_over_limit_in_status40_branch,30,0.00017624665131362504
+v3_modelling_cohort,138591,0.8142066550735536
